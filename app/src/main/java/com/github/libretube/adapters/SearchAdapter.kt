@@ -12,18 +12,18 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.libretube.MainActivity
-import com.github.libretube.PlayerFragment
 import com.github.libretube.R
-import com.github.libretube.VideoOptionsDialog
-import com.github.libretube.formatShort
+import com.github.libretube.dialogs.VideoOptionsDialog
+import com.github.libretube.fragments.PlayerFragment
 import com.github.libretube.obj.SearchItem
+import com.github.libretube.util.formatShort
 import com.squareup.picasso.Picasso
 
 class SearchAdapter(
     private val searchItems: MutableList<SearchItem>,
     private val childFragmentManager: FragmentManager
 ) :
-    RecyclerView.Adapter<CustomViewHolder1>() {
+    RecyclerView.Adapter<SearchViewHolder>() {
 
     fun updateItems(newItems: List<SearchItem>) {
         var searchItemsSize = searchItems.size
@@ -35,7 +35,7 @@ class SearchAdapter(
         return searchItems.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder1 {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
         val layout = when (viewType) {
             0 -> R.layout.video_search_row
             1 -> R.layout.channel_search_row
@@ -44,10 +44,10 @@ class SearchAdapter(
         }
         val layoutInflater = LayoutInflater.from(parent.context)
         val cell = layoutInflater.inflate(layout, parent, false)
-        return CustomViewHolder1(cell, childFragmentManager)
+        return SearchViewHolder(cell, childFragmentManager)
     }
 
-    override fun onBindViewHolder(holder: CustomViewHolder1, position: Int) {
+    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         holder.bind(searchItems[position])
     }
 
@@ -61,7 +61,7 @@ class SearchAdapter(
     }
 }
 
-class CustomViewHolder1(
+class SearchViewHolder(
     private val v: View,
     private val childFragmentManager: FragmentManager
 ) : RecyclerView.ViewHolder(v) {
@@ -70,7 +70,12 @@ class CustomViewHolder1(
         val thumbnailImage = v.findViewById<ImageView>(R.id.search_thumbnail)
         Picasso.get().load(item.thumbnail).fit().centerCrop().into(thumbnailImage)
         val thumbnailDuration = v.findViewById<TextView>(R.id.search_thumbnail_duration)
-        thumbnailDuration.text = DateUtils.formatElapsedTime(item.duration!!)
+        if (item.duration != -1L) {
+            thumbnailDuration.text = DateUtils.formatElapsedTime(item.duration!!)
+        } else {
+            thumbnailDuration.text = v.context.getString(R.string.live)
+            thumbnailDuration.setBackgroundColor(R.attr.colorPrimaryDark)
+        }
         val channelImage = v.findViewById<ImageView>(R.id.search_channel_image)
         Picasso.get().load(item.uploaderAvatar).fit().centerCrop().into(channelImage)
         val title = v.findViewById<TextView>(R.id.search_description)

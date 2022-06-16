@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -18,6 +19,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -30,7 +32,13 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
+import com.github.libretube.fragments.PlayerFragment
+import com.github.libretube.fragments.isFullScreen
+import com.github.libretube.preferences.SponsorBlockSettings
 import com.github.libretube.util.CronetHelper
+import com.github.libretube.util.LocaleHelper
+import com.github.libretube.util.RetrofitInstance
+import com.github.libretube.util.ThemeHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.color.DynamicColors
 
@@ -46,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         CronetHelper.initCronet(this.applicationContext)
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         RetrofitInstance.url =
-            sharedPreferences.getString("instance", "https://pipedapi.kavin.rocks/")!!
+            sharedPreferences.getString("selectInstance", "https://pipedapi.kavin.rocks/")!!
         SponsorBlockSettings.sponsorBlockEnabled =
             sharedPreferences.getBoolean("sb_enabled_key", false)
         SponsorBlockSettings.sponsorNotificationsEnabled =
@@ -61,10 +69,15 @@ class MainActivity : AppCompatActivity() {
             sharedPreferences.getBoolean("sponsors_category_key", false)
         SponsorBlockSettings.outroEnabled =
             sharedPreferences.getBoolean("outro_category_key", false)
+        SponsorBlockSettings.fillerEnabled =
+            sharedPreferences.getBoolean("filler_category_key", false)
+        SponsorBlockSettings.musicOfftopicEnabled =
+            sharedPreferences.getBoolean("music_offtopic_category_key", false)
+        SponsorBlockSettings.previewEnabled =
+            sharedPreferences.getBoolean("preview_category_key", false)
 
-        updateAccentColor(this)
-        updateThemeMode(this)
-        updateLanguage(this)
+        ThemeHelper().updateTheme(this)
+        LocaleHelper().updateLanguage(this)
 
         val connectivityManager =
             this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -76,9 +89,13 @@ class MainActivity : AppCompatActivity() {
             findViewById<Button>(R.id.retry_button).setOnClickListener {
                 recreate()
             }
+            findViewById<ImageView>(R.id.noInternet_settingsImageView).setOnClickListener {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+            }
         } else {
             setContentView(R.layout.activity_main)
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
 
             bottomNavigationView = findViewById(R.id.bottomNav)
             navController = findNavController(R.id.fragment)
@@ -189,19 +206,12 @@ class MainActivity : AppCompatActivity() {
                 .replace("/embed/", "")
             val bundle = Bundle()
             bundle.putString("videoId", watch)
-            val frag = PlayerFragment()
-            frag.arguments = bundle
-            supportFragmentManager.beginTransaction()
-                .remove(PlayerFragment())
-                .commit()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, frag)
-                .commitNow()
-            Handler().postDelayed({
-                val motionLayout = findViewById<MotionLayout>(R.id.playerMotionLayout)
-                motionLayout.transitionToEnd()
-                motionLayout.transitionToStart()
-            }, 100)
+            // for time stamped links
+            if (data.query != null && data.query?.contains("t=")!!) {
+                val timeStamp = data.query.toString().split("t=")[1]
+                bundle.putLong("timeStamp", timeStamp.toLong())
+            }
+            loadWatch(bundle)
         } else if (data.path!!.contains("/watch") && data.query != null) {
             Log.d("dafaq", data.query!!)
             var watch = data.query!!
@@ -216,37 +226,39 @@ class MainActivity : AppCompatActivity() {
             }
             var bundle = Bundle()
             bundle.putString("videoId", watch.replace("v=", ""))
-            var frag = PlayerFragment()
-            frag.arguments = bundle
-            supportFragmentManager.beginTransaction()
-                .remove(PlayerFragment())
-                .commit()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, frag)
-                .commitNow()
-            Handler().postDelayed({
-                val motionLayout = findViewById<MotionLayout>(R.id.playerMotionLayout)
-                motionLayout.transitionToEnd()
-                motionLayout.transitionToStart()
-            }, 100)
+            // for time stamped links
+            if (data.query != null && data.query?.contains("t=")!!) {
+                val timeStamp = data.query.toString().split("t=")[1]
+                bundle.putLong("timeStamp", timeStamp.toLong())
+            }
+            loadWatch(bundle)
         } else {
             var watch = data.path!!.replace("/", "")
             var bundle = Bundle()
             bundle.putString("videoId", watch)
-            var frag = PlayerFragment()
-            frag.arguments = bundle
-            supportFragmentManager.beginTransaction()
-                .remove(PlayerFragment())
-                .commit()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, frag)
-                .commitNow()
-            Handler().postDelayed({
-                val motionLayout = findViewById<MotionLayout>(R.id.playerMotionLayout)
-                motionLayout.transitionToEnd()
-                motionLayout.transitionToStart()
-            }, 100)
+            // for time stamped links
+            if (data.query != null && data.query?.contains("t=")!!) {
+                val timeStamp = data.query.toString().split("t=")[1]
+                bundle.putLong("timeStamp", timeStamp.toLong())
+            }
+            loadWatch(bundle)
         }
+    }
+
+    private fun loadWatch(bundle: Bundle) {
+        var frag = PlayerFragment()
+        frag.arguments = bundle
+        supportFragmentManager.beginTransaction()
+            .remove(PlayerFragment())
+            .commit()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, frag)
+            .commitNow()
+        Handler(Looper.getMainLooper()).postDelayed({
+            val motionLayout = findViewById<MotionLayout>(R.id.playerMotionLayout)
+            motionLayout.transitionToEnd()
+            motionLayout.transitionToStart()
+        }, 100)
     }
 
     override fun onBackPressed() {
@@ -257,7 +269,7 @@ class MainActivity : AppCompatActivity() {
                 findViewById<ConstraintLayout>(R.id.main_container).isClickable = false
                 val motionLayout = findViewById<MotionLayout>(R.id.playerMotionLayout)
                 motionLayout.transitionToEnd()
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT
                 with(motionLayout) {
                     getConstraintSet(R.id.start).constrainHeight(R.id.player, 0)
                     enableTransition(R.id.yt_transition, true)
@@ -273,8 +285,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } catch (e: Exception) {
-            navController.popBackStack()
-            moveTaskToBack(true)
+            // try catch to prevent nointernet activity to crash
+            try {
+                navController.popBackStack()
+                moveTaskToBack(true)
+            } catch (e: Exception) {
+                super.onBackPressed()
+            }
         }
     }
 

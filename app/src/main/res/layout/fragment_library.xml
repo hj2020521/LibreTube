@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Library">
+    tools:context=".fragments.Library">
 
     <RelativeLayout
         android:id="@+id/loginOrRegister2"
@@ -34,7 +33,7 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <com.github.libretube.CustomSwipeToRefresh
+    <com.github.libretube.util.CustomSwipeToRefresh
         android:id="@+id/playlist_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -49,15 +48,6 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/create_playlist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/createPlaylist"
-                    android:layout_gravity="center"
-                    android:layout_margin="8dp"
-                    android:textColor="?attr/colorSurface"
-                    android:drawableLeft="@drawable/ic_add" />
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -72,5 +62,16 @@
                 </RelativeLayout>
             </LinearLayout>
         </ScrollView>
-    </com.github.libretube.CustomSwipeToRefresh>
+    </com.github.libretube.util.CustomSwipeToRefresh>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/create_playlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        app:tint="?android:attr/colorBackground"
+        app:backgroundTint="?attr/colorSecondary"
+        app:srcCompat="@drawable/ic_add" />
+
 </FrameLayout>

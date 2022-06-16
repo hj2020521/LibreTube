@@ -13,28 +13,28 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.libretube.MainActivity
-import com.github.libretube.PlayerFragment
 import com.github.libretube.R
-import com.github.libretube.VideoOptionsDialog
-import com.github.libretube.formatShort
+import com.github.libretube.dialogs.VideoOptionsDialog
+import com.github.libretube.fragments.PlayerFragment
 import com.github.libretube.obj.StreamItem
+import com.github.libretube.util.formatShort
 import com.squareup.picasso.Picasso
 
 class TrendingAdapter(
     private val videoFeed: List<StreamItem>,
     private val childFragmentManager: FragmentManager
-) : RecyclerView.Adapter<CustomViewHolder>() {
+) : RecyclerView.Adapter<TrendingViewHolder>() {
     override fun getItemCount(): Int {
         return videoFeed.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrendingViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val cell = layoutInflater.inflate(R.layout.trending_row, parent, false)
-        return CustomViewHolder(cell)
+        return TrendingViewHolder(cell)
     }
 
-    override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TrendingViewHolder, position: Int) {
         val trending = videoFeed[position]
         holder.v.findViewById<TextView>(R.id.textView_title).text = trending.title
         holder.v.findViewById<TextView>(R.id.textView_channel).text =
@@ -42,8 +42,13 @@ class TrendingAdapter(
             trending.views.formatShort() + " • " +
             DateUtils.getRelativeTimeSpanString(trending.uploaded!!)
         val thumbnailImage = holder.v.findViewById<ImageView>(R.id.thumbnail)
-        holder.v.findViewById<TextView>(R.id.thumbnail_duration).text =
-            DateUtils.formatElapsedTime(trending.duration!!)
+        val thumbnailDuration = holder.v.findViewById<TextView>(R.id.thumbnail_duration)
+        if (trending.duration != -1L) {
+            thumbnailDuration.text = DateUtils.formatElapsedTime(trending.duration!!)
+        } else {
+            thumbnailDuration.text = holder.v.context.getString(R.string.live)
+            thumbnailDuration.setBackgroundColor(R.attr.colorPrimaryDark)
+        }
         val channelImage = holder.v.findViewById<ImageView>(R.id.channel_image)
         channelImage.setOnClickListener {
             val activity = holder.v.context as MainActivity
@@ -89,7 +94,7 @@ class TrendingAdapter(
     }
 }
 
-class CustomViewHolder(val v: View) : RecyclerView.ViewHolder(v) {
+class TrendingViewHolder(val v: View) : RecyclerView.ViewHolder(v) {
     init {
     }
 }

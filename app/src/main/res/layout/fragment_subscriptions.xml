@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Subscriptions">
+    tools:context=".fragments.Subscriptions">
 
     <ProgressBar
         android:id="@+id/sub_progress"
@@ -39,7 +39,7 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <com.github.libretube.CustomSwipeToRefresh
+    <com.github.libretube.util.CustomSwipeToRefresh
         android:id="@+id/sub_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -64,16 +64,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subscriptions"
-                        />
+                        android:text="@string/subscriptions" />
 
                     <ImageView
                         android:id="@+id/toggle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:src="@drawable/ic_arrow_down"
-                    />
+                        android:src="@drawable/ic_arrow_down" />
 
                 </RelativeLayout>
 
@@ -103,5 +101,5 @@
                 </RelativeLayout>
             </LinearLayout>
         </ScrollView>
-    </com.github.libretube.CustomSwipeToRefresh>
+    </com.github.libretube.util.CustomSwipeToRefresh>
 </RelativeLayout>

@@ -1,5 +1,7 @@
 package com.github.libretube.adapters
 
+import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +11,21 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.RecyclerView
 import com.github.libretube.MainActivity
 import com.github.libretube.R
+import com.github.libretube.obj.Subscribe
 import com.github.libretube.obj.Subscription
+import com.github.libretube.util.RetrofitInstance
 import com.squareup.picasso.Picasso
+import java.io.IOException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class SubscriptionChannelAdapter(private val subscriptions: MutableList<Subscription>) :
     RecyclerView.Adapter<SubscriptionChannelViewHolder>() {
+    val TAG = "SubChannelAdapter"
+    private var subscribed = true
+    private var isLoading = false
     override fun getItemCount(): Int {
         return subscriptions.size
     }
@@ -35,6 +47,69 @@ class SubscriptionChannelAdapter(private val subscriptions: MutableList<Subscrip
             val bundle = bundleOf("channel_id" to subscription.url)
             activity.navController.navigate(R.id.channel, bundle)
         }
+        val subscribeBtn = holder.v
+            .findViewById<com.google.android.material.button.MaterialButton>(
+                R.id.subscription_subscribe
+            )
+        subscribeBtn.setOnClickListener {
+            if (!isLoading) {
+                isLoading = true
+                val channelId = subscription.url?.replace("/channel/", "")!!
+                if (subscribed) {
+                    unsubscribe(holder.v.context, channelId)
+                    subscribeBtn.text = holder.v.context.getString(R.string.subscribe)
+                } else {
+                    subscribe(holder.v.context, channelId)
+                    subscribeBtn.text = holder.v.context.getString(R.string.unsubscribe)
+                }
+            }
+        }
+    }
+
+    private fun subscribe(context: Context, channelId: String) {
+        fun run() {
+            CoroutineScope(Dispatchers.IO).launch {
+                val response = try {
+                    val sharedPref = context
+                        .getSharedPreferences("token", Context.MODE_PRIVATE)
+                    RetrofitInstance.api.subscribe(
+                        sharedPref?.getString("token", "")!!,
+                        Subscribe(channelId)
+                    )
+                } catch (e: IOException) {
+                    println(e)
+                    Log.e(TAG, "IOException, you might not have internet connection")
+                } catch (e: HttpException) {
+                    Log.e(TAG, "HttpException, unexpected response")
+                }
+                subscribed = true
+                isLoading = false
+            }
+        }
+        run()
+    }
+
+    private fun unsubscribe(context: Context, channelId: String) {
+        fun run() {
+            CoroutineScope(Dispatchers.IO).launch {
+                val response = try {
+                    val sharedPref =
+                        context.getSharedPreferences("token", Context.MODE_PRIVATE)
+                    RetrofitInstance.api.unsubscribe(
+                        sharedPref?.getString("token", "")!!,
+                        Subscribe(channelId)
+                    )
+                } catch (e: IOException) {
+                    println(e)
+                    Log.e(TAG, "IOException, you might not have internet connection")
+                } catch (e: HttpException) {
+                    Log.e(TAG, "HttpException, unexpected response")
+                }
+                subscribed = false
+                isLoading = false
+            }
+        }
+        run()
     }
 }
 
