@@ -2,87 +2,78 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/player">
+    <PreferenceCategory app:title="@string/advanced">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_download_filled"
+            app:key="automatic_update_checks"
+            app:title="@string/show_updates" />
 
         <ListPreference
-            android:icon="@drawable/ic_hd"
-            app:defaultValue=""
-            app:entries="@array/defres"
-            app:entryValues="@array/defresValue"
-            app:key="default_res"
-            app:title="@string/defres"
+            android:defaultValue="disabled"
+            android:entries="@array/dataSaverModeOptions"
+            android:entryValues="@array/dataSaverModeValues"
+            android:icon="@drawable/ic_data_saver"
+            android:summary="@string/data_saver_mode_summary"
+            app:key="data_saver_mode_key"
+            app:title="@string/data_saver_mode" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_play_circle"
+            android:summary="@string/play_automatically_summary"
+            app:key="play_automatically"
+            app:title="@string/play_automatically" />
+
+        <ListPreference
+            android:entries="@array/cacheSize"
+            android:entryValues="@array/cacheSizeValues"
+            android:icon="@drawable/ic_cache"
+            app:defaultValue="128"
+            app:key="image_cache_size"
+            app:title="@string/maximum_image_cache"
             app:useSimpleSummaryProvider="true" />
 
-        <ListPreference
-            android:icon="@drawable/ic_hd"
-            app:defaultValue="WEBM"
-            app:entries="@array/playerVideoFormats"
-            app:entryValues="@array/playerVideoFormats"
-            app:key="player_video_format"
-            app:title="@string/playerVideoFormat"
-            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            android:icon="@drawable/ic_badge"
+            android:summary="@string/new_videos_badge_summary"
+            app:key="new_videos_badge"
+            app:title="@string/new_videos_badge" />
 
-        <ListPreference
-            android:icon="@drawable/ic_play"
-            app:defaultValue="1F"
-            app:entries="@array/playbackSpeed"
-            app:entryValues="@array/playbackSpeedValues"
-            app:key="playback_speed"
-            app:title="@string/playback_speed"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            android:icon="@drawable/ic_timelapse"
-            app:defaultValue="50"
-            app:entries="@array/bufferingGoal"
-            app:entryValues="@array/bufferingGoal"
-            app:key="buffering_goal"
-            app:summary="@string/buffering_goal_summary"
-            app:title="@string/buffering_goal" />
+        <SwitchPreferenceCompat
+            android:icon="@drawable/ic_check"
+            android:summary="@string/confirm_unsubscribing_summary"
+            app:key="confirm_unsubscribing"
+            app:title="@string/confirm_unsubscribing" />
 
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/downloads">
 
-        <ListPreference
-            app:defaultValue=".mp4"
-            app:entries="@array/videoFormats"
-            app:entryValues="@array/videoFormatsValues"
-            app:icon="@drawable/ic_videocam"
-            app:key="video_format"
-            app:summary="@string/video_format_summary"
-            app:title="@string/video_format" />
-
-        <ListPreference
-            android:defaultValue="downloads"
-            android:entries="@array/downloadLocation"
-            android:entryValues="@array/downloadLocationValues"
-            app:icon="@drawable/ic_download"
-            app:key="download_location"
-            app:summary="@string/download_directory_summary"
-            app:title="@string/download_directory" />
+        <com.github.libretube.ui.views.SliderPreference
+            android:icon="@drawable/ic_download"
+            android:key="max_parallel_downloads"
+            android:title="@string/concurrent_downloads"
+            app:defValue="6"
+            app:stepSize="1"
+            app:valueFrom="1"
+            app:valueTo="6" />
 
         <EditTextPreference
-            android:defaultValue="LibreTube"
-            app:icon="@drawable/ic_folder"
-            app:key="download_folder"
-            app:summary="@string/download_folder_summary"
-            app:title="@string/download_folder" />
+            android:icon="@drawable/ic_open"
+            android:key="external_download_provider"
+            android:summary="@string/external_download_provider_summary"
+            android:title="@string/external_download_provider" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/search_history">
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/ic_history"
-            app:key="search_history_toggle"
-            app:title="@string/search_history" />
+    <PreferenceCategory app:title="@string/misc">
 
         <Preference
-            android:icon="@drawable/ic_trash"
-            app:key="clear_history"
-            app:title="@string/clear_history" />
+            android:icon="@drawable/ic_reset"
+            app:key="reset_settings"
+            app:title="@string/reset" />
 
     </PreferenceCategory>
 

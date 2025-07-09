@@ -1,42 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp">
 
-
-    <TextView
-        android:id="@+id/title"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:gravity="center"
-        android:layout_margin="10dp"
-        android:textSize="20sp" />
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:hint="@string/filename">
 
-    <Spinner
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/fileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.github.libretube.ui.views.DropdownMenu
         android:id="@+id/video_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp" />
+        app:hint="@string/video"
+        app:icon="@drawable/ic_video" />
 
-    <Spinner
+    <com.github.libretube.ui.views.DropdownMenu
         android:id="@+id/audio_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp" />
+        app:hint="@string/audio"
+        app:icon="@drawable/ic_audio" />
 
-    <Button
-        android:id="@+id/download"
-        android:layout_width="wrap_content"
+    <com.github.libretube.ui.views.DropdownMenu
+        android:id="@+id/subtitle_spinner"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/download"
-        android:layout_gravity="right"
-        android:backgroundTint="@android:color/transparent"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="14sp"
-        android:padding="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp" />
+        app:hint="@string/captions"
+        app:icon="@drawable/ic_caption" />
 
 </LinearLayout>
